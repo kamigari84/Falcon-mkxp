@@ -23,8 +23,10 @@
 #define ALUTIL_H
 
 #include <al.h>
+#include <alext.h>
 #include <SDL_audio.h>
 #include <assert.h>
+#include <limits.h>
 
 namespace AL
 {
@@ -194,43 +196,74 @@ namespace Source
 
 inline uint8_t formatSampleSize(int sdlFormat)
 {
+	int sample_size = SDL_AUDIO_BITSIZE(sdlFormat) / 8;
+	if (SDL_AUDIO_ISFLOAT(sdlFormat) && sample_size == 4) return 5; // special check for Float32 Format
+	return sample_size;
+	/*
 	switch (sdlFormat)
 	{
 	case AUDIO_U8 :
+		return sizeof(Uint8);// * CHAR_BIT / 8;
 	case AUDIO_S8 :
-		return 1;
+		return sizeof(Sint8);// * CHAR_BIT / 8;
 
 	case AUDIO_U16LSB :
 	case AUDIO_U16MSB :
+		return sizeof(Uint16);// * CHAR_BIT / 8;
 	case AUDIO_S16LSB :
 	case AUDIO_S16MSB :
-		return 2;
+		return sizeof(Sint16);// * CHAR_BIT / 8;
+
+	case AUDIO_S32LSB :
+	case AUDIO_S32MSB :
+		return sizeof(Sint32);// * CHAR_BIT / 8;
+
+	case AUDIO_F32LSB :
+	case AUDIO_F32MSB :
+		return sizeof(float);// * CHAR_BIT / 8;
 
 	default :
+		return 0;
 		assert(!"Unhandled sample format");
-	}
-
-	return 0;
+	}*/
 }
 
 inline ALenum chooseALFormat(int sampleSize, int channelCount)
 {
+	//return sampleSize * channelCount;
+	//uint8_t sampleSize = formatSampleSize(sdlFormat);
+	if (channelCount>2) channelCount = 2;
+
 	switch (sampleSize)
 	{
-	case 1 :
+	case 1:
 		switch (channelCount)
 		{
 		case 1 : return AL_FORMAT_MONO8;
 		case 2 : return AL_FORMAT_STEREO8;
 		}
-	case 2 :
+	case 2:
 		switch (channelCount)
 		{
 		case 1 : return AL_FORMAT_MONO16;
 		case 2 : return AL_FORMAT_STEREO16;
 		}
-	default :
-		assert(!"Unhandled sample size / channel count");
+	case 4:
+		switch (channelCount)
+		{
+		case 1 : return 4610;
+		case 2 : return 4611;
+		}
+	case 5: //special case for 32-bit float sampling
+		switch (channelCount)
+                {
+                case 1 : return AL_FORMAT_MONO_FLOAT32;
+                case 2 : return AL_FORMAT_STEREO_FLOAT32;;
+                }
+
+	default : //return AL_FORMAT_STEREO16;
+		return 0;
+		assert(!"Unhandled sample size / channel count ");
 	}
 
 	return 0;

@@ -26,6 +26,8 @@
 #include "debugwriter.h"
 #include "fluid-fun.h"
 
+//#include <fluidsynth.h>
+
 #include <assert.h>
 #include <vector>
 #include <string>
@@ -69,21 +71,23 @@ struct SharedMidiState
 
 	void initIfNeeded(const Config &conf)
 	{
-		if (inited)
+		if (inited || !HAVE_FLUID)
 			return;
 
 		inited = true;
 
 		initFluidFunctions();
 
-		if (!HAVE_FLUID)
-			return;
 
 		flSettings = fluid.new_settings();
 		fluid.settings_setnum(flSettings, "synth.gain", 1.0f);
 		fluid.settings_setnum(flSettings, "synth.sample-rate", SYNTH_SAMPLERATE);
-		fluid.settings_setstr(flSettings, "synth.chorus.active", conf.midi.chorus ? "yes" : "no");
-		fluid.settings_setstr(flSettings, "synth.reverb.active", conf.midi.reverb ? "yes" : "no");
+		fluid.settings_setint(flSettings, "synth.chorus.active", conf.midi.chorus);// ? "yes" : "no");
+		fluid.settings_setint(flSettings, "synth.reverb.active", conf.midi.reverb);// ? "yes" : "no");
+
+		/*synth = new_fluid_synth(settings);
+	    	adriver = new_fluid_audio_driver(settings, synth);
+    		sequencer = new_fluid_sequencer2(0);*/
 
 		for (size_t i = 0; i < SYNTH_INIT_COUNT; ++i)
 			addSynth(false);

@@ -8,9 +8,9 @@ INCLUDEPATH += . src
 
 CONFIG(release, debug|release): DEFINES += NDEBUG
 
-CONFIG += c++11
+ CONFIG += c++14
 # And for older qmake versions..
-QMAKE_CXXFLAGS += -std=c++11
+ QMAKE_CXXFLAGS += -std=c++14
 
 isEmpty(BINDING) {
 	BINDING = MRI
@@ -46,7 +46,7 @@ contains(BINDING, NULL) {
 unix {
 	CONFIG += link_pkgconfig
 	PKGCONFIG += sigc++-2.0 pixman-1 zlib physfs vorbisfile \
-	             sdl2 SDL2_image SDL2_ttf SDL_sound openal
+	             sdl2 SDL2_image SDL2_ttf SDL2_sound openal
 
 	SHARED_FLUID {
 		PKGCONFIG += fluidsynth
@@ -214,6 +214,7 @@ EMBED = \
 	shader/simpleMatrix.vert \
 	shader/tilemapvx.vert \
 	assets/liberation.ttf \
+	assets/monapo.ttf \
 	assets/icon.png
 
 SHARED_FLUID {
